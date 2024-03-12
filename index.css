@@ -30,6 +30,10 @@ html, body {
     background-color: rgb(57, 62, 70);
 }
 
+#content {
+    height: 100%;
+}
+
 #dropzonebox {
     display: flex;
     justify-content: center;

@@ -8,17 +8,13 @@
     </head>
     <body>
         <nav id="menu">
-            <a class="nav" href="/">Home</a>
-            <a class="nav" href="/upload">Upload</a>
-            <a class="nav" href="/edit">Edit</a>
+            <a class="nav" href="#home" onclick="loadContent('home')">Home</a>
+            <a class="nav" href="#upload" onclick="loadContent('upload')">Upload</a>
+            <a class="nav" href="#edit" onclick="loadContent('edit')">Edit</a>
         </nav>
-        <div id="dropzonebox">
-            <div id="errorDisplay"></div>
-            <div id="dropzone" class="dragleave">
-                <input id="files" type="file" accept="image/*">
-            </div>
+        <div id="content">
+            <!-- Content will be dynamically loaded here -->
         </div>
-        <canvas id="photo"></canvas>
     </body>
 </html>
 <!-- https://colorhunt.co/palette/222831393e4600adb5eeeeee -->
