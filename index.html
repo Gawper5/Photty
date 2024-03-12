@@ -8,13 +8,15 @@
     </head>
     <body>
         <nav id="menu">
-            <a class="nav" href="#home" onclick="loadContent('home')">Home</a>
-            <a class="nav" href="#upload" onclick="loadContent('upload')">Upload</a>
-            <a class="nav" href="#edit" onclick="loadContent('edit')">Edit</a>
+            <a class="nav" href="home" onclick="loadContent('home'); return false;">Home</a>
+            <a class="nav" href="upload" onclick="loadContent('upload'); return false;">Upload</a>
+            <a class="nav" href="edit" onclick="loadContent('edit'); return false;">Edit</a>
         </nav>
+        <div id="errorDisplay"></div>
         <div id="content">
             <!-- Content will be dynamically loaded here -->
         </div>
     </body>
 </html>
+
 <!-- https://colorhunt.co/palette/222831393e4600adb5eeeeee -->

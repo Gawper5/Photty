@@ -8,6 +8,7 @@ html, body {
     background-color: rgb(34, 40, 49);  
     margin: 0;
     height: 8%;  
+    width: 100%;
     display: flex;  
     align-items: center;  
     box-shadow: 0 2px .4em rgb(0, 173, 181);
@@ -31,7 +32,11 @@ html, body {
 }
 
 #content {
-    height: 100%;
+    height: 92%;
+}
+
+h1 {
+    margin: 0;
 }
 
 #dropzonebox {
@@ -64,4 +69,9 @@ html, body {
 .dragleave {
     border: 3px dashed rgb(0, 173, 181);
     background-color: rgb(200, 200, 200);
+}
+
+#photo {
+    border: 2px solid rgb(34, 40, 49);
+    box-shadow: 0 2px .4em rgb(0, 173, 181);
 }
