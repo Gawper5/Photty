@@ -75,3 +75,9 @@ h1 {
     border: 2px solid rgb(34, 40, 49);
     box-shadow: 0 2px .4em rgb(0, 173, 181);
 }
+
+canvas {
+    display: block;
+    margin: auto;
+    margin-top: 1%;
+}

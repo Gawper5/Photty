@@ -30,7 +30,7 @@ function loadContent(page) {
             history.pushState({page: page}, "", page);
             currentURL = window.location.pathname;
             
-            if (currentURL.includes("/upload")) {
+            if (currentURL === "/upload") {
                 let dropzone = document.getElementById('dropzone');
             
                 dropzone.addEventListener("dragover", (e) => {
@@ -66,22 +66,44 @@ function loadContent(page) {
                     validate();
                 });
             }
-            else if (currentURL.includes("/edit")) {
+            else if (currentURL === "/edit") {
+                if(!image) return loadContent('upload');
                 let canvas = document.getElementById("photo");
                 let ctx = canvas.getContext("2d");
                 let img = new Image;
                 img.onload = function() {
-                    canvas.height = window.innerHeight - 50
-                    canvas.width = canvas.height * 0.875
-                    if(window.innerWidth - 50 < canvas.width) {
-                        canvas.width = window.innerWidth - 50
-                        canvas.height = canvas.width * 1.143
-                    }
                     let w = img.naturalWidth;
                     let h = img.naturalHeight;
-                    canvas.height = 500;
-                    canvas.width = 500;
-                    ctx.drawImage(img, 0, 0, 500, 500);
+                    if (w <= window.innerWidth - 50) {
+                        if (h <= (window.innerHeight - 50) * 0.5) {
+                            canvas.width = w;
+                            canvas.height = h;
+                        }
+                        else {
+                            canvas.height = (window.innerHeight - 50) * 0.5;
+                            let heightScale = canvas.height / h;
+                            canvas.width = w * heightScale;
+                        }
+                    }
+                    else {
+                        if (h <= (window.innerHeight - 50) * 0.5) {
+                            canvas.width = window.innerWidth - 50;
+                            let widthScale = canvas.width / w;
+                            canvas.height = h * widthScale;
+                        }
+                        else {
+                            let widthScale = (window.innerWidth - 50) / w;
+                            let heightScale = ((window.innerHeight - 50) * 0.5) / h;
+                            if (widthScale < heightScale) {
+                                canvas.width = window.innerWidth - 50;
+                                canvas.height = h * widthScale;
+                            } else {
+                                canvas.height = (window.innerHeight - 50) * 0.5;
+                                canvas.width = w * heightScale;
+                            }
+                        }
+                    }
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 }
                 if (image)
                     img.src = URL.createObjectURL(image);
