@@ -1,10 +1,10 @@
 let currentURL = window.location.pathname;
 let errorDisplay = document.getElementById('errorDisplay');;
 let image;
+const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
 function validate(){
     if (image) {
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!allowedTypes.includes(image.type)) {
             displayError("Only png, jpeg and jpg are allowed");
             return;
@@ -16,16 +16,13 @@ function validate(){
 
 function displayError(message) {
     errorDisplay.textContent = message;
-    errorDisplay.hidden = true;
 }
 
 function clearError() {
     errorDisplay.textContent = '';
-    errorDisplay.hidden = false;
 }
 
 function loadContent(page) {
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
     if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) return; 
     clearError();
     let xhttp = new XMLHttpRequest();
@@ -94,6 +91,7 @@ function loadContent(page) {
                         canvas.width = w * heightScale;
                     }
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    console.log(img)
                 }
                 if (image)
                     img.src = URL.createObjectURL(image);
