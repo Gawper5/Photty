@@ -6,7 +6,7 @@ function validate(){
     if (image) {
         const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!allowedTypes.includes(image.type)) {
-            displayError("Only images are allowed.");
+            displayError("Only png, jpeg and jpg are allowed");
             return;
         }
         clearError();
@@ -16,13 +16,18 @@ function validate(){
 
 function displayError(message) {
     errorDisplay.textContent = message;
+    errorDisplay.hidden = true;
 }
 
 function clearError() {
     errorDisplay.textContent = '';
+    errorDisplay.hidden = false;
 }
 
 function loadContent(page) {
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) return; 
+    clearError();
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
@@ -59,8 +64,12 @@ function loadContent(page) {
                         image = e.dataTransfer.files[0];
                     validate();
                 });
-            
+
+                
                 let inputElement = document.getElementById("files");
+                dropzone.onclick = () => {
+                    inputElement.click();
+                }
                 inputElement.addEventListener("change", () => {
                     image = inputElement.files[0];
                     validate();
@@ -74,34 +83,15 @@ function loadContent(page) {
                 img.onload = function() {
                     let w = img.naturalWidth;
                     let h = img.naturalHeight;
-                    if (w <= window.innerWidth - 50) {
-                        if (h <= (window.innerHeight - 50) * 0.5) {
-                            canvas.width = w;
-                            canvas.height = h;
-                        }
-                        else {
-                            canvas.height = (window.innerHeight - 50) * 0.5;
-                            let heightScale = canvas.height / h;
-                            canvas.width = w * heightScale;
-                        }
-                    }
-                    else {
-                        if (h <= (window.innerHeight - 50) * 0.5) {
-                            canvas.width = window.innerWidth - 50;
-                            let widthScale = canvas.width / w;
-                            canvas.height = h * widthScale;
-                        }
-                        else {
-                            let widthScale = (window.innerWidth - 50) / w;
-                            let heightScale = ((window.innerHeight - 50) * 0.5) / h;
-                            if (widthScale < heightScale) {
-                                canvas.width = window.innerWidth - 50;
-                                canvas.height = h * widthScale;
-                            } else {
-                                canvas.height = (window.innerHeight - 50) * 0.5;
-                                canvas.width = w * heightScale;
-                            }
-                        }
+                    let offset = window.innerWidth * 0.01;
+                    let widthScale = (window.innerWidth - offset) / w;
+                    let heightScale = ((window.innerHeight - offset) * 0.4) / h;
+                    if (widthScale < heightScale) {
+                        canvas.width = window.innerWidth - offset;
+                        canvas.height = h * widthScale;
+                    } else {
+                        canvas.height = (window.innerHeight - offset) * 0.4;
+                        canvas.width = w * heightScale;
                     }
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 }
