@@ -14,6 +14,11 @@ html, body {
     box-shadow: 0 2px .4em rgb(0, 173, 181);
 }
 
+nav {
+    gap: 10px;
+    padding-left: 10px;
+}
+
 .nav {
     border-radius: 10px;
     padding-left: 14px;
@@ -80,8 +85,8 @@ html, body {
 }
 
 #photo {
-    border: 2px solid rgb(34, 40, 49);
-    box-shadow: 0 2px .4em rgb(0, 173, 181);
+    border: 1px solid rgb(34, 40, 49);
+    box-shadow: 0 1px .2em rgb(0, 173, 181);
 }
 
 canvas {

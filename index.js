@@ -101,3 +101,5 @@ function loadContent(page) {
     xhttp.open("GET", page + ".html", true);
     xhttp.send();
 }
+
+loadContent('home');
