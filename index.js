@@ -99,13 +99,18 @@ function loadContent(page) {
 
                 let input = document.querySelectorAll("div input");
                 let span = document.querySelectorAll("div span");
-                
+
                 input.forEach((inp, i) => {
                     span[i].innerHTML = inp.value;
                     inp.addEventListener("input", () => {
                         span[i].innerHTML = inp.value;
                     });
                 });
+
+                document.getElementById("clear").onclick = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                }
             }
         }
     };
