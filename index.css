@@ -114,10 +114,14 @@ canvas {
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none; 
-    cursor: pointer;
+    cursor: grab;
     outline: none;
     overflow: hidden;
     border-radius: 16px;
+}
+
+input[type="range"]:active {
+    cursor: grabbing;
 }
 
 input[type="range"]::-webkit-slider-runnable-track {
