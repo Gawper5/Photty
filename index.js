@@ -23,7 +23,7 @@ function clearError() {
 }
 
 function loadContent(page) {
-    if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) return; 
+    if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) //return; 
     clearError();
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -73,7 +73,7 @@ function loadContent(page) {
                 });
             }
             else if (currentURL === "/edit") {
-                if(!image) return loadContent('upload');
+                //if(!image) return loadContent('upload');
                 let canvas = document.getElementById("photo");
                 let ctx = canvas.getContext("2d");
                 let img = new Image;
@@ -83,6 +83,7 @@ function loadContent(page) {
                     let offset = window.innerWidth * 0.01;
                     let widthScale = (window.innerWidth - offset) / w;
                     let heightScale = ((window.innerHeight - offset) * 0.4) / h;
+
                     if (widthScale < heightScale) {
                         canvas.width = window.innerWidth - offset;
                         canvas.height = h * widthScale;
@@ -95,6 +96,16 @@ function loadContent(page) {
                 }
                 if (image)
                     img.src = URL.createObjectURL(image);
+
+                let input = document.querySelectorAll("div input");
+                let span = document.querySelectorAll("div span");
+                
+                input.forEach((inp, i) => {
+                    span[i].innerHTML = inp.value;
+                    inp.addEventListener("input", () => {
+                        span[i].innerHTML = inp.value;
+                    });
+                });
             }
         }
     };

@@ -192,6 +192,12 @@ input[type="range"].b::-moz-range-thumb {
     text-align: center  ;
 }
 
+.box span {
+    width: 25px;  
+    display: inline-block; 
+    text-align: center;
+}
+
 .button {
     height: fit-content;
     width: fit-content;
@@ -205,6 +211,9 @@ input[type="range"].b::-moz-range-thumb {
     margin: 10px;
     font-weight: bold;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .button:hover {
