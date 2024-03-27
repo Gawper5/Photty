@@ -2,14 +2,14 @@
     <canvas id="prephoto"></canvas>
     <canvas id="photo"></canvas>
 </div>
+<div class="inline">
+    <div class="button" id="clear"><img src="./assets/clear.svg" height="26px">Clear</div>
+    <div class="button" id="undo"><img src="./assets/undo.svg" height="26px">Undo</div>
+    <div class="button" id="redo"><img src="./assets/redo.svg" height="26px">Redo</div>
+    <div class="button" id="apply"><img src="./assets/apply.svg" height="26px">Apply</div>
+    <div class="button" id="reset"><img src="./assets/reset.svg" height="26px">Reset</div>
+</div>
 <div class="settings">
-    <div>
-        <div class="button" id="clear"><img src="./assets/clear.svg" height="26px">&nbsp;Clear</div>
-        <div class="button" id="undo"><img src="./assets/undo.svg" height="26px">&nbsp;Undo</div>
-        <div class="button" id="redo"><img src="./assets/redo.svg" height="26px">&nbsp;Redo</div>
-        <div class="button" id="apply"><img src="./assets/apply.svg" height="26px">&nbsp;Apply</div>
-        <div class="button" id="reset">Reset</div>
-    </div>
     <div class="rgb">
         <div class="box">
             <p>RGB Enhancing</p>
@@ -23,12 +23,12 @@
             <input class="g" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
             <input class="b" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
-    </div>
-    <div class="">
         <div class="box">
             <p>Brightness</p>
             <input id="brightness" type="range" min="0" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
+    </div>
+    <div class="">
         <div class="box">
             <p>Box Blur</p>
             <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>

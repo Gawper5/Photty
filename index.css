@@ -117,6 +117,12 @@ canvas {
     gap: -10px;
 }
 
+.inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 input[type="range"] {
     -webkit-appearance: none;
     appearance: none; 
@@ -234,7 +240,7 @@ input[type="range"].b::-moz-range-thumb {
     justify-content: center;
     align-items: center;
     transition: ease-in-out all 0.1s;
-    transform: scale(1);
+    gap: 3px;
 }
 
 .toggled {

@@ -23,7 +23,7 @@ function clearError() {
 }
 
 function loadContent(page) {
-    if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) //return; 
+    if (page === "edit" && (image == null || !allowedTypes.includes(image.type))) return; 
     clearError();
     let xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -73,7 +73,7 @@ function loadContent(page) {
                 });
             }
             else if (currentURL === "/edit") {
-                //if(!image) return loadContent('upload');
+                if(!image) return loadContent('upload');
                 let precanvas = document.getElementById("prephoto");
                 let canvas = document.getElementById("photo");
                 let prectx = precanvas.getContext("2d");
@@ -169,7 +169,7 @@ function loadContent(page) {
                             data[index + 3]; //a
                         }
                     }
-                    
+
                     ctx.putImageData(imageData, 0, 0);
                     change = true;
                 }
