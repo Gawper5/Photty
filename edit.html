@@ -1,40 +1,50 @@
-<canvas id="photo"></canvas>
+<div class="canvas">
+    <canvas id="prephoto"></canvas>
+    <canvas id="photo"></canvas>
+</div>
 <div class="settings">
     <div>
-        <div class="button" id="clear"><img src="./assets/clear.svg" height="32px">Clear</div>
-        <div class="button" id="undo"><img src="./assets/undo.svg" height="32px">&nbsp;Undo</div>
-        <div class="button" id="apply"><img src="./assets/apply.svg" height="24px">&nbsp;Apply</div>
+        <div class="button" id="clear"><img src="./assets/clear.svg" height="26px">&nbsp;Clear</div>
+        <div class="button" id="undo"><img src="./assets/undo.svg" height="26px">&nbsp;Undo</div>
+        <div class="button" id="redo"><img src="./assets/redo.svg" height="26px">&nbsp;Redo</div>
+        <div class="button" id="apply"><img src="./assets/apply.svg" height="26px">&nbsp;Apply</div>
+        <div class="button" id="reset">Reset</div>
     </div>
-    <div>
+    <div class="rgb">
         <div class="box">
             <p>RGB Enhancing</p>
-            <input class="r" type="range" min="0" max="255" value="0"/><span></span><br/>
-            <input class="g" type="range" min="0" max="255" value="0"/><span></span><br/>
-            <input class="b" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <input class="r" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
+            <input class="g" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
+            <input class="b" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
         <div class="box">
             <p>RGB Removal</p>
-            <input class="r" type="range" min="0" max="255" value="0"/><span></span><br/>
-            <input class="g" type="range" min="0" max="255" value="0"/><span></span><br/>
-            <input class="b" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <input class="r" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
+            <input class="g" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
+            <input class="b" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
     </div>
-    <div>
+    <div class="">
         <div class="box">
             <p>Brightness</p>
-            <input class="" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <input id="brightness" type="range" min="0" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
         <div class="box">
-            <p>Grayscale</p>
-            <input class="" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <p>Box Blur</p>
+            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
         <div class="box">
-            <p>Blur</p>
-            <input class="" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <p>Gaussian Blur</p>
+            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
         <div class="box">
             <p>Sharpness</p>
-            <input class="" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+        </div>
+        <div class="box">
+            <p>Threshold</p>
+            <input id="threshold" type="range" min="0" max="255" value="0"/><span></span><br/>
         </div>
     </div>
+    <div class="button" id="grayscale">Grayscale</div>
 </div>

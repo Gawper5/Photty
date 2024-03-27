@@ -83,16 +83,22 @@ nav {
     background-color: rgb(200, 200, 200);
 }
 
-#photo {
+#photo, #prephoto {
     border: 1px solid rgb(34, 40, 49);
     box-shadow: 0 1px .2em rgb(0, 173, 181);
 }
 
 canvas {
     display: block;
-    margin: auto;
-    margin-top: 1%;
-    margin-bottom: 1%;
+}
+
+.canvas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 10px;
+    width: auto;
 }
 
 .large {
@@ -196,6 +202,7 @@ input[type="range"].b::-moz-range-thumb {
     margin: 10px;
     font-weight: bold;
     cursor: default;
+    gap: 10px;
 }
 
 .box p {
@@ -230,12 +237,16 @@ input[type="range"].b::-moz-range-thumb {
     transform: scale(1);
 }
 
+.toggled {
+    box-shadow: 0 1px .2em red;
+}
+
 .button:hover {
    background-color: rgb(57, 62, 70);
 }
 
 .button:active {
-    transform: scale(0.9);
+    transform: scale(0.94);
 }
 
 .button[id="clear"] {
@@ -248,8 +259,6 @@ input[type="range"].b::-moz-range-thumb {
 
 .button[id="apply"] {
     background-color: rgb(21, 107, 34);
-    padding-top: 15px;
-    padding-bottom: 15px;
 }
 
 .button[id="apply"]:hover {

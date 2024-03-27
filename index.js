@@ -74,9 +74,15 @@ function loadContent(page) {
             }
             else if (currentURL === "/edit") {
                 //if(!image) return loadContent('upload');
+                let precanvas = document.getElementById("prephoto");
                 let canvas = document.getElementById("photo");
+                let prectx = precanvas.getContext("2d");
                 let ctx = canvas.getContext("2d");
                 let img = new Image;
+                let history = Array();
+                let historyIndex = 0;
+                let imageData;
+                let change = false;
                 img.onload = function() {
                     let w = img.naturalWidth;
                     let h = img.naturalHeight;
@@ -85,14 +91,22 @@ function loadContent(page) {
                     let heightScale = ((window.innerHeight - offset) * 0.4) / h;
 
                     if (widthScale < heightScale) {
+                        precanvas.width = window.innerWidth - offset;
+                        precanvas.height = h * widthScale;
                         canvas.width = window.innerWidth - offset;
                         canvas.height = h * widthScale;
                     } else {
+                        precanvas.height = (window.innerHeight - offset) * 0.4;
+                        precanvas.width = w * heightScale;
                         canvas.height = (window.innerHeight - offset) * 0.4;
                         canvas.width = w * heightScale;
                     }
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    console.log(img)
+
+                    prectx.drawImage(img, 0, 0, precanvas.width, precanvas.height);
+                    prectx.willReadFrequently = true;
+                    imageData = prectx.getImageData(0, 0, canvas.width, canvas.height);
+                    ctx.putImageData(imageData, 0, 0);
+                    history.push(imageData);
                 }
                 if (image)
                     img.src = URL.createObjectURL(image);
@@ -104,12 +118,107 @@ function loadContent(page) {
                     span[i].innerHTML = inp.value;
                     inp.addEventListener("input", () => {
                         span[i].innerHTML = inp.value;
+                        updateImage();
                     });
                 });
 
-                document.getElementById("clear").onclick = () => {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                document.getElementById("clear").onclick = () => clear();
+                document.getElementById("reset").onclick = () => reset();
+                document.getElementById("undo").onclick = () => undo();
+                document.getElementById("redo").onclick = () => redo();
+                document.getElementById("apply").onclick = () => apply();
+                
+                let grayBut = document.getElementById("grayscale");
+                grayBut.onclick = () => {
+                    if (grayBut.classList.contains("toggled"))
+                        grayBut.classList.remove("toggled");
+                    else 
+                        grayBut.classList.add("toggled");
+                    updateImage()
+                }
+
+                function updateImage() {
+                    imageData = new ImageData(history[historyIndex].width, history[historyIndex].height);
+                    imageData.data.set(history[historyIndex].data);
+
+                    let re = document.getElementsByClassName("r")[0].value;
+                    let ge = document.getElementsByClassName("g")[0].value;
+                    let be = document.getElementsByClassName("b")[0].value;
+                    let rd = document.getElementsByClassName("r")[1].value;
+                    let gd = document.getElementsByClassName("g")[1].value;
+                    let bd = document.getElementsByClassName("b")[1].value;
+                    let brightness = document.getElementById("brightness").value;
+
+                    let { width, height, data } = imageData;
+
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            let index = (y * width + x) * 4; 
+
+                            if (grayBut.classList.contains("toggled")) {
+                                let grayscale = ((data[index] + data[index + 1] + data[index + 2]) / 3);
+
+                                data[index] = grayscale; //r
+                                data[index + 1] = grayscale; //g
+                                data[index + 2] = grayscale; //b
+                            }
+
+                            data[index] *= (brightness * re / rd); //g
+                            data[index + 1] *= (brightness * ge / gd); //g
+                            data[index + 2] *= (brightness * be / bd); //b
+                            data[index + 3]; //a
+                        }
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    change = true;
+                }
+
+                function clear() {
+                    if (history.length > 1) {
+                        history.splice(1);
+                        historyIndex = 0;
+                    }
+                    reset();
+                }
+
+                function undo() {
+                    if (historyIndex > 0)
+                        historyIndex--;
+                    reset();
+                }
+
+                function redo() {
+                    if (historyIndex < history.length - 1)
+                        historyIndex++;
+                    reset();
+                }
+
+                function apply() {
+                    if (change) {
+                        history.push(imageData);
+                        historyIndex++;
+                        change = false;
+                    }
+                    reset();
+                }
+
+                function reset() {
+                    imageData = history[historyIndex];
+                    prectx.putImageData(imageData, 0, 0);
+                    ctx.putImageData(imageData, 0, 0);
+
+                    input.forEach((inp) => {
+                        inp.value = 0;
+                    });
+
+                    document.getElementById("brightness").value = 1;
+
+                    input.forEach((inp, i) => {
+                        span[i].innerHTML = inp.value;
+                    });
+
+                    grayBut.classList.remove("toggled");
                 }
             }
         }
@@ -119,3 +228,7 @@ function loadContent(page) {
 }
 
 loadContent('home');
+
+function map_range(value, low1, high1, low2, high2) {
+    return low2 + (high2 - low2) * (value - low1) / (high1 - low1);
+}
