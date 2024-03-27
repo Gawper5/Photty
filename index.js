@@ -196,6 +196,8 @@ function loadContent(page) {
 
                 function apply() {
                     if (change) {
+                        if (historyIndex < history.length - 1)
+                            history.splice(historyIndex + 1);
                         history.push(imageData);
                         historyIndex++;
                         change = false;
