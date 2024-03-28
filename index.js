@@ -73,7 +73,6 @@ function loadContent(page) {
                 });
             }
             else if (currentURL === "/edit") {
-                if(!image) return loadContent('upload');
                 let precanvas = document.getElementById("prephoto");
                 let canvas = document.getElementById("photo");
                 let prectx = precanvas.getContext("2d");
@@ -103,7 +102,6 @@ function loadContent(page) {
                     }
 
                     prectx.drawImage(img, 0, 0, precanvas.width, precanvas.height);
-                    prectx.willReadFrequently = true;
                     imageData = prectx.getImageData(0, 0, canvas.width, canvas.height);
                     ctx.putImageData(imageData, 0, 0);
                     history.push(imageData);
@@ -124,9 +122,12 @@ function loadContent(page) {
 
                 document.getElementById("clear").onclick = () => clear();
                 document.getElementById("reset").onclick = () => reset();
-                document.getElementById("undo").onclick = () => undo();
-                document.getElementById("redo").onclick = () => redo();
-                document.getElementById("apply").onclick = () => apply();
+                let undo = document.getElementById("undo");
+                let redo = document.getElementById("redo");
+                let apply = document.getElementById("apply");
+                undo.onclick = () => undoF();
+                redo.onclick = () => redoF();
+                apply.onclick = () => applyF();
                 
                 let grayBut = document.getElementById("grayscale");
                 grayBut.onclick = () => {
@@ -141,37 +142,43 @@ function loadContent(page) {
                     imageData = new ImageData(history[historyIndex].width, history[historyIndex].height);
                     imageData.data.set(history[historyIndex].data);
 
-                    let re = document.getElementsByClassName("r")[0].value;
-                    let ge = document.getElementsByClassName("g")[0].value;
-                    let be = document.getElementsByClassName("b")[0].value;
-                    let rd = document.getElementsByClassName("r")[1].value;
-                    let gd = document.getElementsByClassName("g")[1].value;
-                    let bd = document.getElementsByClassName("b")[1].value;
+                    let r = (document.getElementsByClassName("r")[0].value / document.getElementsByClassName("r")[1].value);
+                    let g = (document.getElementsByClassName("g")[0].value / document.getElementsByClassName("g")[1].value);
+                    let b = (document.getElementsByClassName("b")[0].value / document.getElementsByClassName("b")[1].value);
                     let brightness = document.getElementById("brightness").value;
+                    let threshold = document.getElementById("threshold").value;
 
                     let { width, height, data } = imageData;
 
                     for (let y = 0; y < height; y++) {
                         for (let x = 0; x < width; x++) {
                             let index = (y * width + x) * 4; 
-
-                            if (grayBut.classList.contains("toggled")) {
+                            if (threshold > 0) {
+                                let thresholdV = ((data[index] + data[index + 1] + data[index + 2]) / 3) >= threshold ? 255 : 0;
+                                data[index] = thresholdV; //r
+                                data[index + 1] = thresholdV; //g
+                                data[index + 2] = thresholdV; //b
+                            }
+                            else if (grayBut.classList.contains("toggled")) {
                                 let grayscale = ((data[index] + data[index + 1] + data[index + 2]) / 3);
-
                                 data[index] = grayscale; //r
                                 data[index + 1] = grayscale; //g
                                 data[index + 2] = grayscale; //b
                             }
+                                
+                            data[index] *= (brightness * r); //g
+                            data[index + 1] *= (brightness * g); //g
+                            data[index + 2] *= (brightness * b); //b
 
-                            data[index] *= (brightness * re / rd); //g
-                            data[index + 1] *= (brightness * ge / gd); //g
-                            data[index + 2] *= (brightness * be / bd); //b
                             data[index + 3]; //a
                         }
                     }
 
                     ctx.putImageData(imageData, 0, 0);
                     change = true;
+                    if (apply.classList.contains("unavalible"))
+                        apply.classList.remove("unavalible");
+
                 }
 
                 function clear() {
@@ -182,30 +189,42 @@ function loadContent(page) {
                     reset();
                 }
 
-                function undo() {
+                function undoF() {
                     if (historyIndex > 0)
                         historyIndex--;
                     reset();
                 }
 
-                function redo() {
+                function redoF() {
                     if (historyIndex < history.length - 1)
                         historyIndex++;
                     reset();
                 }
 
-                function apply() {
+                function applyF() {
                     if (change) {
                         if (historyIndex < history.length - 1)
                             history.splice(historyIndex + 1);
                         history.push(imageData);
                         historyIndex++;
-                        change = false;
                     }
                     reset();
                 }
 
                 function reset() {
+                    if (change)
+                        change = false;
+                    if (!change)
+                        apply.classList.add("unavalible");
+                    if(historyIndex == 0)
+                        undo.classList.add("unavalible");
+                    else
+                        undo.classList.remove("unavalible");
+                    if(historyIndex == history.length - 1)
+                        redo.classList.add("unavalible");
+                    else
+                        redo.classList.remove("unavalible");
+
                     imageData = history[historyIndex];
                     prectx.putImageData(imageData, 0, 0);
                     ctx.putImageData(imageData, 0, 0);

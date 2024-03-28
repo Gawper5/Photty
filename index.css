@@ -235,7 +235,6 @@ input[type="range"].b::-moz-range-thumb {
     margin: 10px;
     margin-right: 15px;
     font-weight: bold;
-    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -247,11 +246,16 @@ input[type="range"].b::-moz-range-thumb {
     box-shadow: 0 1px .2em red;
 }
 
-.button:hover {
-   background-color: rgb(57, 62, 70);
+.unavalible {
+    opacity: 0.25;
 }
 
-.button:active {
+.button:not(.unavalible):hover {
+   background-color: rgb(57, 62, 70);
+   cursor: pointer;
+}
+
+.button:not(.unavalible):active {
     transform: scale(0.94);
 }
 
@@ -259,7 +263,7 @@ input[type="range"].b::-moz-range-thumb {
     background-color: rgb(145, 28, 28);
 }
 
-.button[id="clear"]:hover {
+.button[id="clear"]:not(.unavalible):hover {
     background-color: rgb(165, 33, 33);
 }
 
@@ -267,6 +271,6 @@ input[type="range"].b::-moz-range-thumb {
     background-color: rgb(21, 107, 34);
 }
 
-.button[id="apply"]:hover {
+.button[id="apply"]:not(.unavalible):hover {
     background-color: rgb(27, 128, 42);
 }
