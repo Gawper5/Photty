@@ -10,7 +10,7 @@
     <div class="button" id="reset"><img src="./assets/reset.svg" height="26px">Reset</div>
 </div>
 <div class="settings">
-    <div class="rgb">
+    <div>
         <div class="box">
             <p>RGB Enhancing</p>
             <input class="r" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
@@ -27,23 +27,27 @@
             <p>Brightness</p>
             <input id="brightness" type="range" min="0" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
+        <div class="box">
+            <p>Threshold</p>
+            <input id="threshold" type="range" min="0" max="255" value="0"/><span></span><br/>
+        </div>
     </div>
     <div class="">
         <div class="box">
             <p>Box Blur</p>
-            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+            <input id="box-blur" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
         <div class="box">
             <p>Gaussian Blur</p>
-            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+            <input id="gaussian-blur" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
         <div class="box">
-            <p>Sharpness</p>
-            <input class="" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+            <p>Sharpening</p>
+            <input id="sharpening" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
         <div class="box">
-            <p>Threshold</p>
-            <input id="threshold" type="range" min="0" max="255" value="0"/><span></span><br/>
+            <p>Unsharpening Mask</p>
+            <input id="unsharpening-mask" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
     </div>
     <div class="button" id="grayscale">Grayscale</div>
