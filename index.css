@@ -9,8 +9,8 @@ html, body {
 
 #content {
     overflow: auto;
-    height: 92%;
-    margin-right: 2px;
+    height: calc(92% - 4px);
+    margin: 2px;
 }
 
 #content::-webkit-scrollbar {
