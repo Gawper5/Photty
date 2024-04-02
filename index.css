@@ -87,7 +87,7 @@ nav {
     width: 80%;
     height: 80%;
     text-align: center;
-    box-shadow: 0 2px .4em rgba(0, 172, 181, 0.632);
+    box-shadow: 0 1px .2em rgb(0, 173, 181);
     border-radius: 30px;
     cursor: pointer;
     display: flex;
@@ -96,7 +96,7 @@ nav {
 }
 
 #dropzone:hover {
-    border: 3px solid rgb(0, 173, 181);
+    border: 2px solid rgb(0, 173, 181);
     background-color: rgb(211, 211, 211);
 }
 
@@ -105,12 +105,12 @@ nav {
 }
 
 .dragover {
-    border: 3px solid rgb(0, 173, 181);
+    border: 2px solid rgb(0, 173, 181);
     background-color: rgb(211, 211, 211);
 }
 
 .dragleave {
-    border: 3px dashed rgb(0, 173, 181);
+    border: 2px dashed rgb(0, 173, 181);
     background-color: rgb(200, 200, 200);
 }
 
@@ -274,7 +274,7 @@ input[type="range"].b::-moz-range-thumb {
 }
 
 .toggled {
-    box-shadow: 0 1px .2em red;
+    box-shadow: 0 1px .2em rgb(193, 0, 0);
 }
 
 .unavalible {

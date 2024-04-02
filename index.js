@@ -147,12 +147,17 @@ function loadContent(page) {
                     let b = (document.getElementsByClassName("b")[0].value / document.getElementsByClassName("b")[1].value);
                     let brightness = document.getElementById("brightness").value;
                     let threshold = document.getElementById("threshold").value;
+                    let box_blur = document.getElementById("box-blur").value;
+                    let gaussian_blur = document.getElementById("gaussian-blur").value;
+                    let sharpening = document.getElementById("sharpening").value;
+                    let unsharpening_mask = document.getElementById("unsharpening-mask").value;
 
                     let { width, height, data } = imageData;
 
                     for (let y = 0; y < height; y++) {
                         for (let x = 0; x < width; x++) {
                             let index = (y * width + x) * 4; 
+                            
                             if (threshold > 0) {
                                 let thresholdV = ((data[index] + data[index + 1] + data[index + 2]) / 3) >= threshold ? 255 : 0;
                                 data[index] = thresholdV; //r
@@ -165,20 +170,58 @@ function loadContent(page) {
                                 data[index + 1] = grayscale; //g
                                 data[index + 2] = grayscale; //b
                             }
-                                
+                            
                             data[index] *= (brightness * r); //g
                             data[index + 1] *= (brightness * g); //g
                             data[index + 2] *= (brightness * b); //b
-
+                            
                             data[index + 3]; //a
                         }
                     }
-
-                    ctx.putImageData(imageData, 0, 0);
+                
+                    if (box_blur > 0)
+                        applyBoxBlur(imageData, box_blur);
+                    
                     change = true;
+                    ctx.putImageData(imageData, 0, 0);
                     if (apply.classList.contains("unavalible"))
                         apply.classList.remove("unavalible");
 
+                }
+
+                function applyBoxBlur(imageData, radius) {
+                    let { width, height, data } = imageData;
+
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            let index = (y * width + x) * 4; 
+                            let sumR = 0, sumG = 0, sumB = 0, count = 0;
+
+                            for (let dy = -radius; dy <= radius; dy++) {
+                                for (let dx = -radius; dx <= radius; dx++) {
+                                    let nx = x + dx;
+                                    let ny = y + dy;
+
+                                    // Ensure neighboring pixel is within image bounds
+                                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                        let _index = (ny * width + nx) * 4; // Calculate index of neighboring pixel
+                                        sumR += data[_index]; // Accumulate red channel value
+                                        sumG += data[_index + 1]; // Accumulate green channel value
+                                        sumB += data[_index + 2]; // Accumulate blue channel value
+                                        count++; // Increase count of neighboring pixels
+                                    }
+                                }
+                            }
+
+                            let avgR = sumR / count;
+                            let avgG = sumG / count;
+                            let avgB = sumB / count;
+            
+                            data[index] = avgR;
+                            data[index + 1] = avgG;
+                            data[index + 2] = avgB;
+                        }
+                    }
                 }
 
                 function clear() {
