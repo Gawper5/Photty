@@ -165,7 +165,7 @@ function loadContent(page) {
                                 data[index + 2] = thresholdV; //b
                             }
                             else if (grayBut.classList.contains("toggled")) {
-                                let grayscale = ((data[index] + data[index + 1] + data[index + 2]) / 3);
+                                let grayscale = (0.299 * data[index] + 0.587 * data[index + 1] + 0.114 * data[index + 2]);
                                 data[index] = grayscale; //r
                                 data[index + 1] = grayscale; //g
                                 data[index + 2] = grayscale; //b
@@ -181,6 +181,9 @@ function loadContent(page) {
                 
                     if (box_blur > 0)
                         applyBoxBlur(imageData, box_blur);
+
+                    if (gaussian_blur > 0)
+                        applyGaussianBlur(imageData, gaussian_blur);
                     
                     change = true;
                     ctx.putImageData(imageData, 0, 0);
@@ -222,6 +225,70 @@ function loadContent(page) {
                             data[index + 2] = avgB;
                         }
                     }
+                }
+
+                function applyGaussianBlur(imageData, radius) {
+                    let { data, width, height } = imageData;
+                    let kernel = createGaussianKernel(radius);
+
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            let index = (y * width + x) * 4; 
+                            let sumR = 0, sumG = 0, sumB = 0, sumA = 0;
+
+                            for (let ky = -radius; ky <= radius; ky++) {
+                                for (let kx = -radius; kx <= radius; kx++) {
+                                    let pixelX = x + kx;
+                                    let pixelY = y + ky;
+
+                                    if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height) {
+                                        let _index = (pixelY * width + pixelX) * 4;
+                                        let weight = kernel[ky + radius * 1][kx + radius * 1];
+                
+                                        sumR += data[_index] * weight;
+                                        sumG += data[_index + 1] * weight;
+                                        sumB += data[_index + 2] * weight;
+                                        sumA += data[_index + 3] * weight;
+                                    }
+                                }
+                            }
+                
+                            data[index] = sumR;
+                            data[index + 1] = sumG;
+                            data[index + 2] = sumB;
+                            data[index + 3] = sumA;
+                        }
+                    }
+                }
+
+                function createGaussianKernel(radius) {
+                    let size = radius * 2 + 1;
+                    let kernel = [];
+                
+                    let sigma = radius / 3;
+                    let sigma22 = 2 * sigma * sigma;
+                    let sqrtPiSigma22 = Math.sqrt(Math.PI * sigma22);
+                
+                    let sum = 0;
+                    for (let y = -radius; y <= radius; y++) {
+                        let row = [];
+                        for (let x = -radius; x <= radius; x++) {
+                            let distance = (x * x + y * y);
+                            let weight = Math.exp(-distance / sigma22) / sqrtPiSigma22;
+                            sum += weight;
+                            row.push(weight);
+                        }
+                        kernel.push(row);
+                    }
+                
+                    // Normalize the kernel
+                    for (let y = 0; y < size; y++) {
+                        for (let x = 0; x < size; x++) {
+                            kernel[y][x] /= sum;
+                        }
+                    }
+                
+                    return kernel;
                 }
 
                 function clear() {

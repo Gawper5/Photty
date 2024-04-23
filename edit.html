@@ -23,6 +23,8 @@
             <input class="g" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
             <input class="b" type="range" min="1" max="2" step="0.01" value="1"/><span></span><br/>
         </div>
+    </div>
+    <div>
         <div class="box">
             <p>Brightness</p>
             <input id="brightness" type="range" min="0" max="2" step="0.01" value="1"/><span></span><br/>
@@ -31,24 +33,36 @@
             <p>Threshold</p>
             <input id="threshold" type="range" min="0" max="255" value="0"/><span></span><br/>
         </div>
+        <div class="box">
+            <p>Sharpening</p>
+            <input id="sharpening" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+        </div>
     </div>
-    <div class="">
+    <div>
         <div class="box">
             <p>Box Blur</p>
             <input id="box-blur" type="range" min="0" max="5" value="0"/><span></span><br/>
         </div>
         <div class="box">
             <p>Gaussian Blur</p>
-            <input id="gaussian-blur" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
-        </div>
-        <div class="box">
-            <p>Sharpening</p>
-            <input id="sharpening" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+            <input id="gaussian-blur" type="range" min="0" max="5" value="0"/><span></span><br/>
         </div>
         <div class="box">
             <p>Unsharpening Mask</p>
             <input id="unsharpening-mask" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
         </div>
     </div>
-    <div class="button" id="grayscale">Grayscale</div>
+    <div>
+        <div class="box">
+            <p>Sobel</p>
+            <input id="sobel" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+        </div>
+        <div class="box">
+            <p>Laplace</p>
+            <input id="laplace" type="range" min="0" max="2" step="0.1" value="0"/><span></span><br/>
+        </div>
+    </div>
+    <div>
+        <div class="button" id="grayscale">Grayscale</div>
+    </div>
 </div>

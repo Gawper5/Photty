@@ -148,6 +148,11 @@ canvas {
     gap: -10px;
 }
 
+.settings div {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
 .inline {
     display: flex;
     justify-content: center;
