@@ -141,18 +141,36 @@ function loadContent(page) {
                 let sobelBut = document.getElementById("sobel");
                 sobelBut.onclick = () => {
                     if (sobelBut.classList.contains("toggled"))
-                    sobelBut.classList.remove("toggled");
+                        sobelBut.classList.remove("toggled");
                     else 
-                    sobelBut.classList.add("toggled");
+                        sobelBut.classList.add("toggled");
                     updateImage()
                 }
 
                 let laplaceBut = document.getElementById("laplace");
                 laplaceBut.onclick = () => {
                     if (laplaceBut.classList.contains("toggled"))
-                    laplaceBut.classList.remove("toggled");
+                        laplaceBut.classList.remove("toggled");
                     else 
-                    laplaceBut.classList.add("toggled");
+                        laplaceBut.classList.add("toggled");
+                    updateImage()
+                }
+
+                let sharpBut = document.getElementById("sharp");
+                sharpBut.onclick = () => {
+                    if (sharpBut.classList.contains("toggled"))
+                        sharpBut.classList.remove("toggled");
+                    else 
+                        sharpBut.classList.add("toggled");
+                    updateImage()
+                }
+
+                let unsharpBut = document.getElementById("unsharp");
+                unsharpBut.onclick = () => {
+                    if (unsharpBut.classList.contains("toggled"))
+                        unsharpBut.classList.remove("toggled");
+                    else 
+                        unsharpBut.classList.add("toggled");
                     updateImage()
                 }
 
@@ -167,9 +185,7 @@ function loadContent(page) {
                     let threshold = document.getElementById("threshold").value;
                     let box_blur = document.getElementById("box-blur").value;
                     let gaussian_blur = document.getElementById("gaussian-blur").value;
-                    let sharpening = document.getElementById("sharpening").value;
-                    let unsharpening_mask = document.getElementById("unsharpening-mask").value;
-
+    
                     let { width, height, data } = imageData;
 
                     for (let y = 0; y < height; y++) {
@@ -208,6 +224,12 @@ function loadContent(page) {
 
                     if (laplaceBut.classList.contains("toggled"))
                         applyMatrix(imageData, [-1,-1,-1,-1,8,-1,-1,-1,-1]);
+
+                    if (sharpBut.classList.contains("toggled"))
+                        applyMatrix(imageData, [0,-1,0,-1,5,-1,0,-1,0]);
+
+                    if (unsharpBut.classList.contains("toggled"))
+                        applyUnsharpMasking(imageData, 0.2, 2);
                     
                     change = true;
                     ctx.putImageData(imageData, 0, 0);
@@ -282,6 +304,9 @@ function loadContent(page) {
                             data[index + 3] = sumA;
                         }
                     }
+
+                    let x = new ImageData(width, height, data);
+                    return x;
                 }
 
                 function createGaussianKernel(radius) {
@@ -383,28 +408,35 @@ function loadContent(page) {
 
                     for (let y = kernelRadius; y < height - kernelRadius; y++) {
                         for (let x = kernelRadius; x < width - kernelRadius; x++) {
-                            let sum = 0;
+                            let sumR = 0, sumG = 0, sumB = 0;
 
                             for (let ky = 0; ky < kernelSize; ky++) {
                                 for (let kx = 0; kx < kernelSize; kx++) {
                                     let pixelIndex = ((y + ky) * width + (x + kx)) * 4;
                                     let kernelValue = kernel[ky * kernelSize + kx];
-                                    sum += data[pixelIndex] * kernelValue;
+                                    sumR += data[pixelIndex] * kernelValue;
+                                    sumG += data[pixelIndex + 1] * kernelValue;
+                                    sumB += data[pixelIndex + 2] * kernelValue;
                                 }
                             }
 
                             let index = (y * width + x) * 4;
-                            data[index] = sum;
-                            data[index + 1] = sum;
-                            data[index + 2] = sum;
+                            data[index] = sumR;
+                            data[index + 1] = sumG;
+                            data[index + 2] = sumB;
                             data[index + 3] = 255;
                         }
                     }
                 }
 
-                //masks
+                function applyUnsharpMasking(imageData, strength, radius) {
+                    let blurredImageData = applyGaussianBlur(imageData, radius);
 
-
+                    let { width, height, data } = imageData;
+                    for (let i = 0; i < data.length; i++) {
+                        data[i] += strength * (imageData.data[i] - blurredImageData.data[i]);
+                    }
+                }
 
                 function clear() {
                     if (history.length > 1) {
@@ -469,6 +501,8 @@ function loadContent(page) {
                     grayBut.classList.remove("toggled");
                     sobelBut.classList.remove("toggled");
                     laplaceBut.classList.remove("toggled");
+                    sharpBut.classList.remove("toggled");
+                    unsharpBut.classList.remove("toggled");
                 }
             }
         }
