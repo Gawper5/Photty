@@ -138,6 +138,24 @@ function loadContent(page) {
                     updateImage()
                 }
 
+                let sobelBut = document.getElementById("sobel");
+                sobelBut.onclick = () => {
+                    if (sobelBut.classList.contains("toggled"))
+                    sobelBut.classList.remove("toggled");
+                    else 
+                    sobelBut.classList.add("toggled");
+                    updateImage()
+                }
+
+                let laplaceBut = document.getElementById("laplace");
+                laplaceBut.onclick = () => {
+                    if (laplaceBut.classList.contains("toggled"))
+                    laplaceBut.classList.remove("toggled");
+                    else 
+                    laplaceBut.classList.add("toggled");
+                    updateImage()
+                }
+
                 function updateImage() {
                     imageData = new ImageData(history[historyIndex].width, history[historyIndex].height);
                     imageData.data.set(history[historyIndex].data);
@@ -159,13 +177,13 @@ function loadContent(page) {
                             let index = (y * width + x) * 4; 
                             
                             if (threshold > 0) {
-                                let thresholdV = ((data[index] + data[index + 1] + data[index + 2]) / 3) >= threshold ? 255 : 0;
+                                let thresholdV = (0.2126 * data[index] + 0.7152 * data[index + 1] + 0.0722 * data[index + 2]) >= threshold ? 255 : 0;
                                 data[index] = thresholdV; //r
                                 data[index + 1] = thresholdV; //g
                                 data[index + 2] = thresholdV; //b
                             }
                             else if (grayBut.classList.contains("toggled")) {
-                                let grayscale = (0.299 * data[index] + 0.587 * data[index + 1] + 0.114 * data[index + 2]);
+                                let grayscale = (0.2126 * data[index] + 0.7152 * data[index + 1] + 0.0722 * data[index + 2]);
                                 data[index] = grayscale; //r
                                 data[index + 1] = grayscale; //g
                                 data[index + 2] = grayscale; //b
@@ -184,6 +202,12 @@ function loadContent(page) {
 
                     if (gaussian_blur > 0)
                         applyGaussianBlur(imageData, gaussian_blur);
+
+                    if (sobelBut.classList.contains("toggled"))
+                        applySobel(imageData);
+
+                    if (laplaceBut.classList.contains("toggled"))
+                        applyMatrix(imageData, [-1,-1,-1,-1,8,-1,-1,-1,-1]);
                     
                     change = true;
                     ctx.putImageData(imageData, 0, 0);
@@ -205,13 +229,12 @@ function loadContent(page) {
                                     let nx = x + dx;
                                     let ny = y + dy;
 
-                                    // Ensure neighboring pixel is within image bounds
                                     if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
-                                        let _index = (ny * width + nx) * 4; // Calculate index of neighboring pixel
-                                        sumR += data[_index]; // Accumulate red channel value
-                                        sumG += data[_index + 1]; // Accumulate green channel value
-                                        sumB += data[_index + 2]; // Accumulate blue channel value
-                                        count++; // Increase count of neighboring pixels
+                                        let _index = (ny * width + nx) * 4;
+                                        sumR += data[_index];
+                                        sumG += data[_index + 1];
+                                        sumB += data[_index + 2];
+                                        count++;
                                     }
                                 }
                             }
@@ -280,8 +303,7 @@ function loadContent(page) {
                         }
                         kernel.push(row);
                     }
-                
-                    // Normalize the kernel
+
                     for (let y = 0; y < size; y++) {
                         for (let x = 0; x < size; x++) {
                             kernel[y][x] /= sum;
@@ -290,6 +312,99 @@ function loadContent(page) {
                 
                     return kernel;
                 }
+
+                function applySobel(imageData) {
+                    let { data, width, height } = imageData;
+                    let grayscaleData = convertToGrayscale(imageData);
+                
+                    let sobelX = [
+                        [-1, 0, 1],
+                        [-2, 0, 2],
+                        [-1, 0, 1]
+                    ];
+                    let sobelY = [
+                        [-1, -2, -1],
+                        [ 0,  0,  0],
+                        [ 1,  2,  1]
+                    ];
+                
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            let sumX = 0, sumY = 0;
+                
+                            for (let ky = -1; ky <= 1; ky++) {
+                                for (let kx = -1; kx <= 1; kx++) {
+                                    let pixelX = x + kx;
+                                    let pixelY = y + ky;
+
+                                    if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height) {
+                                        let kernelValueX = sobelX[ky + 1][kx + 1];
+                                        let kernelValueY = sobelY[ky + 1][kx + 1];
+
+                                        let grayscaleIndex = (pixelY * width + pixelX) * 4;
+                                        let intensity = grayscaleData[grayscaleIndex];
+                                        sumX += intensity * kernelValueX;
+                                        sumY += intensity * kernelValueY;
+                                    }
+                                }
+                            }
+
+                            let gradientMagnitude = Math.sqrt(sumX * sumX + sumY * sumY);
+                            let pixelIndex = (y * width + x) * 4;
+                            data[pixelIndex] = gradientMagnitude; // R
+                            data[pixelIndex + 1] = gradientMagnitude; // G
+                            data[pixelIndex + 2] = gradientMagnitude; // B
+                            data[pixelIndex + 3] = 255;
+                        }
+                    }
+                }
+
+                function convertToGrayscale(imageData) {
+                    let { data } = imageData;
+                    let grayscaleData = new Uint8ClampedArray(data.length);
+
+                    for (let i = 0; i < data.length; i += 4) {
+                        let intensity = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+
+                        grayscaleData[i] = intensity; // R
+                        grayscaleData[i + 1] = intensity; // G
+                        grayscaleData[i + 2] = intensity; // B
+                        grayscaleData[i + 3] = data[i + 3];
+                    }
+                
+                    return grayscaleData;
+                }
+
+                function applyMatrix(imageData, kernel) {
+                    let { width, height, data } = imageData;
+
+                    let kernelSize = Math.sqrt(kernel.length);
+                    let kernelRadius = Math.floor(kernelSize / 2);
+
+                    for (let y = kernelRadius; y < height - kernelRadius; y++) {
+                        for (let x = kernelRadius; x < width - kernelRadius; x++) {
+                            let sum = 0;
+
+                            for (let ky = 0; ky < kernelSize; ky++) {
+                                for (let kx = 0; kx < kernelSize; kx++) {
+                                    let pixelIndex = ((y + ky) * width + (x + kx)) * 4;
+                                    let kernelValue = kernel[ky * kernelSize + kx];
+                                    sum += data[pixelIndex] * kernelValue;
+                                }
+                            }
+
+                            let index = (y * width + x) * 4;
+                            data[index] = sum;
+                            data[index + 1] = sum;
+                            data[index + 2] = sum;
+                            data[index + 3] = 255;
+                        }
+                    }
+                }
+
+                //masks
+
+
 
                 function clear() {
                     if (history.length > 1) {
@@ -300,15 +415,17 @@ function loadContent(page) {
                 }
 
                 function undoF() {
-                    if (historyIndex > 0)
+                    if (historyIndex > 0) {
                         historyIndex--;
-                    reset();
+                        reset();
+                    }
                 }
 
                 function redoF() {
-                    if (historyIndex < history.length - 1)
+                    if (historyIndex < history.length - 1) {
                         historyIndex++;
-                    reset();
+                        reset();
+                    }
                 }
 
                 function applyF() {
@@ -317,8 +434,8 @@ function loadContent(page) {
                             history.splice(historyIndex + 1);
                         history.push(imageData);
                         historyIndex++;
+                        reset();
                     }
-                    reset();
                 }
 
                 function reset() {
@@ -350,6 +467,8 @@ function loadContent(page) {
                     });
 
                     grayBut.classList.remove("toggled");
+                    sobelBut.classList.remove("toggled");
+                    laplaceBut.classList.remove("toggled");
                 }
             }
         }
