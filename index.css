@@ -119,6 +119,10 @@ nav {
     box-shadow: 0 1px .2em rgb(0, 173, 181);
 }
 
+#photo {
+    cursor: crosshair;
+}
+
 canvas {
     display: block;
 }
@@ -231,6 +235,30 @@ input[type="range"].b::-moz-range-thumb {
     box-shadow: -407px 0 0 400px blue;
 }
 
+input[type="color"] {
+    width: 158px;
+    border-radius: 5px;
+}
+
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+}
+
+#grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(25px, 1fr));
+    grid-template-rows: repeat(3, minmax(25px, 1fr));
+}
+
 .box {
     height: max-content;
     width: max-content;
@@ -249,7 +277,7 @@ input[type="range"].b::-moz-range-thumb {
 
 .box p {
     margin: 0;
-    text-align: center  ;
+    text-align: center;
 }
 
 .box span {

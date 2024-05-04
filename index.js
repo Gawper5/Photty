@@ -76,12 +76,13 @@ function loadContent(page) {
                 let precanvas = document.getElementById("prephoto");
                 let canvas = document.getElementById("photo");
                 let prectx = precanvas.getContext("2d");
-                let ctx = canvas.getContext("2d");
+                let ctx = canvas.getContext("2d", { willReadFrequently: true });
                 let img = new Image;
                 let history = Array();
                 let historyIndex = 0;
                 let imageData;
                 let change = false;
+                let temp_imgdata;
                 img.onload = function() {
                     let w = img.naturalWidth;
                     let h = img.naturalHeight;
@@ -101,24 +102,72 @@ function loadContent(page) {
                         canvas.width = w * heightScale;
                     }
 
+                    imageData = new ImageData(canvas.width, canvas.height);
+                    temp_imgdata = new ImageData(canvas.width, canvas.height);
                     prectx.drawImage(img, 0, 0, precanvas.width, precanvas.height);
-                    imageData = prectx.getImageData(0, 0, canvas.width, canvas.height);
+                    imageData.data.set(prectx.getImageData(0, 0, canvas.width, canvas.height).data);
                     ctx.putImageData(imageData, 0, 0);
-                    history.push(imageData);
+                    history.push(imageData.data);
+                    temp_imgdata.data.set(imageData.data);
+                    updateGraph(imageData);
                 }
                 if (image)
                     img.src = URL.createObjectURL(image);
 
-                let input = document.querySelectorAll("div input");
+                let input = document.querySelectorAll('div input[type="range"]');
                 let span = document.querySelectorAll("div span");
 
                 input.forEach((inp, i) => {
                     span[i].innerHTML = inp.value;
                     inp.addEventListener("input", () => {
                         span[i].innerHTML = inp.value;
-                        updateImage();
+                        if (inp.id != "brush_size" && inp.id != "kernel_size")
+                            updateImage();
                     });
                 });
+
+                let initialData = {
+                    labels: ["0 - 50", "51 - 101", "102 - 152", "153 - 203", "204 - 255"],
+                    datasets: [{
+                        label: "Red",
+                        data: [0, 0, 0, 0, 0], 
+                        backgroundColor: "rgba(255, 99, 132, 0.5)",
+                        borderColor: "rgba(255, 99, 132, 1)",
+                        borderWidth: 1
+                    }, 
+                    {
+                        label: "Green",
+                        data: [0, 0, 0, 0, 0], 
+                        backgroundColor: "rgba(75, 192, 192, 0.5)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1
+                    }, 
+                    {
+                        label: "Blue",
+                        data: [0, 0, 0, 0, 0], 
+                        backgroundColor: "rgba(54, 162, 235, 0.5)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        borderWidth: 1
+                    }]
+                };
+                
+                let options = {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                };
+  
+                let graph = document.getElementById('histogram');
+                let grapgh_ctx = graph.getContext('2d');
+
+                let histogram = new Chart(grapgh_ctx, {
+                    type: 'bar',
+                    data: initialData,
+                    options: options
+                });
+            
 
                 document.getElementById("clear").onclick = () => clear();
                 document.getElementById("reset").onclick = () => reset();
@@ -174,9 +223,109 @@ function loadContent(page) {
                     updateImage()
                 }
 
+                let selectBut = document.getElementById("select");
+                selectBut.onclick = () => {
+                    if (selectBut.classList.contains("toggled"))
+                        selectBut.classList.remove("toggled");
+                    else 
+                        selectBut.classList.add("toggled");
+                }
+
+                let brushBut = document.getElementById("brush");
+                brushBut.onclick = () => {
+                    if (brushBut.classList.contains("toggled"))
+                        brushBut.classList.remove("toggled");
+                    else 
+                        brushBut.classList.add("toggled");
+                }
+
+                let matrixBut = document.getElementById("matrix_but");
+                matrixBut.onclick = () => {
+                    let matrix = document.querySelectorAll('div[id="grid"] input');
+                    let kernel = [];
+                    matrix.forEach(e => {
+                        kernel.push(e.value);
+                    });
+                    imageData = new ImageData(canvas.width, canvas.height);
+                    imageData.data.set(temp_imgdata.data);
+                    applyMatrix(imageData, kernel);
+                    showPic(imageData);
+                }
+
+                let matrixSlider = document.getElementById("kernel_size");
+                matrixSlider.oninput = () => {
+                    let grid = document.getElementById("grid");
+                    while (grid.firstChild) {
+                        grid.removeChild(grid.firstChild);
+                    }
+                    for (let i = 0; i < matrixSlider.value * matrixSlider.value; i++) {
+                        let newInput = document.createElement("input");
+                        newInput.setAttribute("type", "number");
+                        newInput.setAttribute("value", "0");
+                        grid.append(newInput);
+                    }
+                    grid.style.gridTemplateRows = `repeat(${matrixSlider.value}, minmax(25px, 1fr))`;
+                    grid.style.gridTemplateColumns = `repeat(${matrixSlider.value}, minmax(25px, 1fr))`;
+                }
+                
+                let isDrawing = false;
+                let x = 0, y = 0;
+
+                canvas.addEventListener('mousedown', e => {
+                    if (brushBut.classList.contains("toggled")) {
+                        let rect = canvas.getBoundingClientRect();
+                        x = e.clientX - rect.left;
+                        y = e.clientY - rect.top;
+                        isDrawing = true;
+                    }
+                    else isDrawing = false;
+                });
+
+                canvas.addEventListener('mousemove', e => {
+                    if (isDrawing === true) {
+                        let rect = canvas.getBoundingClientRect();
+                        drawLine(x, y, e.clientX - rect.left, e.clientY - rect.top);
+                        x = e.clientX - rect.left;
+                        y = e.clientY - rect.top;
+                        change = true;
+                    }
+                });
+
+                canvas.addEventListener('mouseup', e => {
+                    if (isDrawing === true) {
+                        let rect = canvas.getBoundingClientRect();
+                        drawLine(x, y, e.clientX - rect.left, e.clientY - rect.top);
+                        x = 0;
+                        y = 0;
+                        isDrawing = false;
+                        temp_imgdata.data.set(ctx.getImageData(0, 0, temp_imgdata.width, temp_imgdata.height).data);
+                        imageData = new ImageData(canvas.width, canvas.height);
+                        imageData.data.set(temp_imgdata.data);
+                        change = true;
+
+                        if (apply.classList.contains("unavalible"))
+                            apply.classList.remove("unavalible");
+                    }
+                });
+
+                function drawLine(x1, y1, x2, y2) {
+                    let brush_color = document.getElementById("brush_color").value;
+                    let brush_size = document.getElementById("brush_size").value;
+                    
+                    ctx.beginPath();
+                    ctx.strokeStyle = brush_color;
+                    ctx.lineWidth = brush_size;
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                    ctx.closePath();
+                }
+
                 function updateImage() {
-                    imageData = new ImageData(history[historyIndex].width, history[historyIndex].height);
-                    imageData.data.set(history[historyIndex].data);
+                    imageData = new ImageData(canvas.width, canvas.height); //! Funny JS ce tega ni
+                    imageData.data.set(temp_imgdata.data);
 
                     let r = (document.getElementsByClassName("r")[0].value / document.getElementsByClassName("r")[1].value);
                     let g = (document.getElementsByClassName("g")[0].value / document.getElementsByClassName("g")[1].value);
@@ -187,6 +336,24 @@ function loadContent(page) {
                     let gaussian_blur = document.getElementById("gaussian-blur").value;
     
                     let { width, height, data } = imageData;
+
+                    if (box_blur > 0)
+                        applyBoxBlur(imageData, box_blur);
+
+                    if (gaussian_blur > 0)
+                        applyGaussianBlur(imageData, gaussian_blur);
+
+                    if (sobelBut.classList.contains("toggled"))
+                        applySobel(imageData);
+
+                    if (laplaceBut.classList.contains("toggled"))
+                        applyMatrix(imageData, [-1,-1,-1,-1,8,-1,-1,-1,-1]);
+
+                    if (sharpBut.classList.contains("toggled"))
+                        applyMatrix(imageData, [0,-1,0,-1,5,-1,0,-1,0]);
+
+                    if (unsharpBut.classList.contains("toggled"))
+                        applyUnsharpMasking(imageData, 0.2, 2);
 
                     for (let y = 0; y < height; y++) {
                         for (let x = 0; x < width; x++) {
@@ -212,30 +379,8 @@ function loadContent(page) {
                             data[index + 3]; //a
                         }
                     }
-                
-                    if (box_blur > 0)
-                        applyBoxBlur(imageData, box_blur);
-
-                    if (gaussian_blur > 0)
-                        applyGaussianBlur(imageData, gaussian_blur);
-
-                    if (sobelBut.classList.contains("toggled"))
-                        applySobel(imageData);
-
-                    if (laplaceBut.classList.contains("toggled"))
-                        applyMatrix(imageData, [-1,-1,-1,-1,8,-1,-1,-1,-1]);
-
-                    if (sharpBut.classList.contains("toggled"))
-                        applyMatrix(imageData, [0,-1,0,-1,5,-1,0,-1,0]);
-
-                    if (unsharpBut.classList.contains("toggled"))
-                        applyUnsharpMasking(imageData, 0.2, 2);
                     
-                    change = true;
-                    ctx.putImageData(imageData, 0, 0);
-                    if (apply.classList.contains("unavalible"))
-                        apply.classList.remove("unavalible");
-
+                    showPic(imageData);
                 }
 
                 function applyBoxBlur(imageData, radius) {
@@ -405,8 +550,8 @@ function loadContent(page) {
 
                     let kernelSize = Math.sqrt(kernel.length);
 
-                    for (let y = 0; y < height; y++) {
-                        for (let x = 0; x < width; x++) {
+                    for (let y = 1; y < height - 1; y++) {
+                        for (let x = 1; x < width - 1; x++) {
                             let sumR = 0, sumG = 0, sumB = 0;
 
                             for (let ky = 0; ky < kernelSize; ky++) {
@@ -437,6 +582,56 @@ function loadContent(page) {
                     }
                 }
 
+                function updateGraph(imageData) {
+                    let { width, height, data } = imageData;
+
+                    let graphData = {
+                        r: [0, 0, 0, 0, 0],
+                        b: [0, 0, 0, 0, 0],
+                        g: [0, 0, 0, 0, 0]
+                    }
+
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
+                            let index = (y * width + x) * 4;
+                            
+                            let r = data[index];
+                            let g = data[index + 1];
+                            let b = data[index + 2];
+
+                            if (r < 51) graphData.r[0]++;
+                            else if (r >= 51 && r < 102) graphData.r[1]++;
+                            else if (r >= 102 && r < 153) graphData.r[2]++;
+                            else if (r >= 153 && r < 204) graphData.r[3]++;
+                            else if (r >= 204) graphData.r[4]++;
+
+                            if (b < 51) graphData.b[0]++;
+                            else if (b >= 51 && b < 102) graphData.b[1]++;
+                            else if (b >= 102 && b < 153) graphData.b[2]++;
+                            else if (b >= 153 && b < 204) graphData.b[3]++;
+                            else if (b >= 204) graphData.b[4]++;
+
+                            if (g < 51) graphData.g[0]++;
+                            else if (g >= 51 && g < 102) graphData.g[1]++;
+                            else if (g >= 102 && g < 153) graphData.g[2]++;
+                            else if (g >= 153 && g < 204) graphData.g[3]++;
+                            else if (g >= 204) graphData.r[4]++;
+                        }
+                    }
+
+                    histogram.data.datasets[0].data = [graphData.r[0], graphData.r[1], graphData.r[2], graphData.r[3], graphData.r[4]];
+                    histogram.data.datasets[1].data = [graphData.g[0], graphData.g[1], graphData.g[2], graphData.g[3], graphData.g[4]];
+                    histogram.data.datasets[2].data = [graphData.b[0], graphData.b[1], graphData.b[2], graphData.b[3], graphData.b[4]];
+                    histogram.update();
+                }
+
+                function showPic(imageData) {
+                    change = true;
+                    ctx.putImageData(imageData, 0, 0);
+                    if (apply.classList.contains("unavalible"))
+                        apply.classList.remove("unavalible");
+                }
+
                 function clear() {
                     if (history.length > 1) {
                         history.splice(1);
@@ -463,7 +658,7 @@ function loadContent(page) {
                     if (change) {
                         if (historyIndex < history.length - 1)
                             history.splice(historyIndex + 1);
-                        history.push(imageData);
+                        history.push(imageData.data);
                         historyIndex++;
                         reset();
                     }
@@ -483,9 +678,9 @@ function loadContent(page) {
                     else
                         redo.classList.remove("unavalible");
 
-                    imageData = history[historyIndex];
-                    prectx.putImageData(imageData, 0, 0);
-                    ctx.putImageData(imageData, 0, 0);
+                    temp_imgdata.data.set(history[historyIndex]);
+                    prectx.putImageData(temp_imgdata, 0, 0);
+                    ctx.putImageData(temp_imgdata, 0, 0);
 
                     input.forEach((inp) => {
                         inp.value = 0;
@@ -502,6 +697,23 @@ function loadContent(page) {
                     laplaceBut.classList.remove("toggled");
                     sharpBut.classList.remove("toggled");
                     unsharpBut.classList.remove("toggled");
+                    selectBut.classList.remove("toggled");
+                    brushBut.classList.remove("toggled");
+
+                    let grid = document.getElementById("grid");
+                    while (grid.firstChild) {
+                        grid.removeChild(grid.firstChild);
+                    }
+                    for (let i = 0; i < matrixSlider.value * matrixSlider.value; i++) {
+                        let newInput = document.createElement("input");
+                        newInput.setAttribute("type", "number");
+                        newInput.setAttribute("value", "0");
+                        grid.append(newInput);
+                    }
+                    grid.style.gridTemplateRows = `repeat(${matrixSlider.value}, minmax(25px, 1fr))`;
+                    grid.style.gridTemplateColumns = `repeat(${matrixSlider.value}, minmax(25px, 1fr))`;
+
+                    updateGraph(temp_imgdata);
                 }
             }
         }

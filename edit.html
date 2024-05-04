@@ -50,5 +50,40 @@
         <div class="button" id="grayscale">Grayscale</div>
         <div class="button" id="sobel">Sobel</div>
         <div class="button" id="laplace">Laplace</div>
+        <div class="button" id="select">Select</div>
     </div>
+    <div>
+        <div class="button" id="brush">Brush</div>
+        <div class="box">
+            <p>Brush Size</p>
+            <input id="brush_size" type="range" min="1" max="50" value="1"/><span></span><br/>
+        </div>
+        <div class="box">
+            <p>Brush Color</p>
+            <input id="brush_color" type="color"/>
+        </div>
+    </div>
+    <div>
+        <div class="box">
+            <p>Kernel</p>
+            <input id="kernel_size" type="range" min="3" max="9" value="3"/><span></span><br/>
+        </div>
+        <div  class="box">
+            <div id="grid">
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+                <input type="number" value="0"/>
+            </div>
+        </div>
+        <div class="button" id="matrix_but">Apply Kernel</div>
+    </div>
+</div>
+<div>
+    <canvas id="histogram"></canvas>
 </div>
