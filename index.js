@@ -223,14 +223,6 @@ function loadContent(page) {
                     updateImage()
                 }
 
-                let selectBut = document.getElementById("select");
-                selectBut.onclick = () => {
-                    if (selectBut.classList.contains("toggled"))
-                        selectBut.classList.remove("toggled");
-                    else 
-                        selectBut.classList.add("toggled");
-                }
-
                 let brushBut = document.getElementById("brush");
                 brushBut.onclick = () => {
                     if (brushBut.classList.contains("toggled"))
@@ -697,7 +689,6 @@ function loadContent(page) {
                     laplaceBut.classList.remove("toggled");
                     sharpBut.classList.remove("toggled");
                     unsharpBut.classList.remove("toggled");
-                    selectBut.classList.remove("toggled");
                     brushBut.classList.remove("toggled");
 
                     let grid = document.getElementById("grid");
