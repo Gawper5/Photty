@@ -357,14 +357,14 @@ function loadContent(page) {
                         for (let x = 0; x < width; x++) {
                             let sumX = 0, sumY = 0;
                 
-                            for (let ky = -1; ky <= 1; ky++) {
-                                for (let kx = -1; kx <= 1; kx++) {
+                            for (let ky = 0; ky <= 2; ky++) {
+                                for (let kx = 0; kx <= 2; kx++) {
                                     let pixelX = x + kx;
                                     let pixelY = y + ky;
 
                                     if (pixelX >= 0 && pixelX < width && pixelY >= 0 && pixelY < height) {
-                                        let kernelValueX = sobelX[ky + 1][kx + 1];
-                                        let kernelValueY = sobelY[ky + 1][kx + 1];
+                                        let kernelValueX = sobelX[ky][kx];
+                                        let kernelValueY = sobelY[ky][kx];
 
                                         let grayscaleIndex = (pixelY * width + pixelX) * 4;
                                         let intensity = grayscaleData[grayscaleIndex];
@@ -404,10 +404,9 @@ function loadContent(page) {
                     let { width, height, data } = imageData;
 
                     let kernelSize = Math.sqrt(kernel.length);
-                    let kernelRadius = Math.floor(kernelSize / 2);
 
-                    for (let y = kernelRadius; y < height - kernelRadius; y++) {
-                        for (let x = kernelRadius; x < width - kernelRadius; x++) {
+                    for (let y = 0; y < height; y++) {
+                        for (let x = 0; x < width; x++) {
                             let sumR = 0, sumG = 0, sumB = 0;
 
                             for (let ky = 0; ky < kernelSize; ky++) {
