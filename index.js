@@ -364,11 +364,18 @@ function loadContent(page) {
                                 data[index + 2] = grayscale; //b
                             }
                             
-                            data[index] *= (brightness * r); //g
-                            data[index + 1] *= (brightness * g); //g
-                            data[index + 2] *= (brightness * b); //b
-                            
-                            data[index + 3]; //a
+                            if (brightness != 1) {
+                                data[index] = Math.pow(data[index], brightness); //r
+                                data[index + 1] = Math.pow(data[index + 1], brightness); //g
+                                data[index + 2] = Math.pow(data[index + 2], brightness); //b
+                            }
+            
+                            if (r != 1)
+                                data[index] *= r; //r
+                            if (g != 1)
+                                data[index + 1] *= g; //g
+                            if (b != 1)
+                                data[index + 2] *= b; //b
                         }
                     }
                     
